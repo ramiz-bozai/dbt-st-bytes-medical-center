@@ -1,0 +1,83 @@
+config-version: 2
+
+name: "st_bytes_medical_center"
+version: "1.0.0"
+require-dbt-version: ">=1.5.0"
+
+profile: st_bytes_medical_center
+
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["data-tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+target-path: "target"
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+# query-comment:
+#   comment: "{{ query_comment_json() }}"
+#   append: true
+
+vars:
+  bronze_catalog: "{{ target.catalog }}"
+  bronze_schema: "raw"
+
+models:
+  st_bytes_medical_center:
+    staging:
+      +schema: staging
+      +materialized: view
+      +query_tags: '{"layer":"bronze","domain":"healthcare"}'
+    intermediate:
+      +schema: intermediate
+      +materialized: materialized_view
+      +query_tags: '{"layer":"silver","domain":"healthcare"}'
+    marts:
+      +schema: marts
+      +materialized: materialized_view
+      +query_tags: '{"layer":"gold","domain":"healthcare"}'
+
+seeds:
+  st_bytes_medical_center:
+    st_bytes_medical_center:
+      +schema: raw_st_bytes_medical_center
+      patients:
+        +alias: raw_patients
+      providers:
+        +alias: raw_providers
+      organizations:
+        +alias: raw_organizations
+      payers:
+        +alias: raw_payers
+      encounters:
+        +alias: raw_encounters
+      claims:
+        +alias: raw_claims
+      claims_transactions:
+        +alias: raw_claims_transactions
+      conditions:
+        +alias: raw_conditions
+      procedures:
+        +alias: raw_procedures
+      observations:
+        +alias: raw_observations
+      medications:
+        +alias: raw_medications
+      immunizations:
+        +alias: raw_immunizations
+      allergies:
+        +alias: raw_allergies
+      careplans:
+        +alias: raw_careplans
+      devices:
+        +alias: raw_devices
+      supplies:
+        +alias: raw_supplies
+      imaging_studies:
+        +alias: raw_imaging_studies
+      payer_transitions:
+        +alias: raw_payer_transitions

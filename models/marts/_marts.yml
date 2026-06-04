@@ -1,0 +1,28 @@
+version: 2
+
+models:
+  - name: dim_patients
+    description: Gold patient dimension with age bands and mortality flag.
+    columns:
+      - name: patient_id
+        tests: [unique, not_null]
+  - name: fct_encounters
+    description: Gold encounter fact with provider, organization, and payer context.
+    columns:
+      - name: encounter_id
+        tests: [unique, not_null]
+      - name: patient_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_patients')
+              field: patient_id
+  - name: fct_claims
+    columns:
+      - name: claim_id
+        tests: [unique, not_null]
+  - name: mart_patient_summary
+    description: One row per patient with utilization and financial rollups.
+    columns:
+      - name: patient_id
+        tests: [unique, not_null]
