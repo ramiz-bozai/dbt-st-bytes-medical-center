@@ -1,4 +1,4 @@
-with source as (select * from {{ source('bronze', 'raw_observations') }})
+with source as (select * from {{ source('synthea_flat', 'raw_observations') }})
 select
     {{ cast_to_timestamp("date") }} as observation_at,
     patient as patient_id,

@@ -1,4 +1,4 @@
-with source as (select * from {{ source('bronze', 'raw_devices') }})
+with source as (select * from {{ source('synthea_flat', 'raw_devices') }})
 select
     {{ cast_to_timestamp("start") }} as device_start_at,
     {{ cast_to_timestamp("stop") }} as device_end_at,

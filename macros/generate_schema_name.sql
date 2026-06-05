@@ -12,7 +12,7 @@
 
     {# specified custom schema names go to the schema name prepended with the default schema name in prod #}
     {% elif target.name == 'prod' %}
-        {{ default_schema }}_{{ custom_schema_name | trim }}
+        {{ custom_schema_name | trim }}
 
     {# specified custom schemas go to the default target schema for non-prod targets #}
     {% else %}

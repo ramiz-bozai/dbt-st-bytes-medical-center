@@ -3,11 +3,40 @@ version: 2
 models:
   - name: dim_patients
     description: Gold patient dimension with age bands and mortality flag.
+    config:
+      query_tags: '{"layer":"gold","dbt_layer":"marts","domain":"Patient"}'
     columns:
       - name: patient_id
         tests: [unique, not_null]
+
+  - name: mart_patient_summary
+    description: One row per patient with utilization and financial rollups.
+    config:
+      query_tags: '{"layer":"gold","dbt_layer":"marts","domain":"Patient"}'
+    columns:
+      - name: patient_id
+        tests: [unique, not_null]
+
+  - name: mart_patient_coverage_timeline
+    config:
+      query_tags: '{"layer":"gold","dbt_layer":"marts","domain":"Patient"}'
+
+  - name: mart_vital_signs_latest
+    config:
+      query_tags: '{"layer":"gold","dbt_layer":"marts","domain":"Patient"}'
+
+  - name: dim_providers
+    config:
+      query_tags: '{"layer":"gold","dbt_layer":"marts","domain":"Operations"}'
+
+  - name: dim_organizations
+    config:
+      query_tags: '{"layer":"gold","dbt_layer":"marts","domain":"Operations"}'
+
   - name: fct_encounters
     description: Gold encounter fact with provider, organization, and payer context.
+    config:
+      query_tags: '{"layer":"gold","dbt_layer":"marts","domain":"Operations"}'
     columns:
       - name: encounter_id
         tests: [unique, not_null]
@@ -15,14 +44,109 @@ models:
         tests:
           - not_null
           - relationships:
-              to: ref('dim_patients')
-              field: patient_id
+              arguments:
+                to: ref('dim_patients')
+                field: patient_id
+
+  - name: mart_organization_utilization
+    config:
+      query_tags: '{"layer":"gold","dbt_layer":"marts","domain":"Operations"}'
+
+  - name: mart_provider_panel
+    config:
+      query_tags: '{"layer":"gold","dbt_layer":"marts","domain":"Operations"}'
+
+  - name: mart_encounter_cost_analysis
+    config:
+      query_tags: '{"layer":"gold","dbt_layer":"marts","domain":"Operations"}'
+
+  - name: dim_payers
+    config:
+      query_tags: '{"layer":"gold","dbt_layer":"marts","domain":"Revenue cycle"}'
+
   - name: fct_claims
+    config:
+      query_tags: '{"layer":"gold","dbt_layer":"marts","domain":"Revenue cycle"}'
     columns:
       - name: claim_id
         tests: [unique, not_null]
-  - name: mart_patient_summary
-    description: One row per patient with utilization and financial rollups.
-    columns:
-      - name: patient_id
-        tests: [unique, not_null]
+
+  - name: fct_claim_transactions
+    config:
+      query_tags: '{"layer":"gold","dbt_layer":"marts","domain":"Revenue cycle"}'
+
+  - name: mart_claims_aging
+    config:
+      query_tags: '{"layer":"gold","dbt_layer":"marts","domain":"Revenue cycle"}'
+
+  - name: mart_payer_financials
+    config:
+      query_tags: '{"layer":"gold","dbt_layer":"marts","domain":"Revenue cycle"}'
+
+  - name: mart_revenue_cycle
+    config:
+      query_tags: '{"layer":"gold","dbt_layer":"marts","domain":"Revenue cycle"}'
+
+  - name: fct_allergies
+    config:
+      query_tags: '{"layer":"gold","dbt_layer":"marts","domain":"Clinical"}'
+
+  - name: fct_care_plans
+    config:
+      query_tags: '{"layer":"gold","dbt_layer":"marts","domain":"Clinical"}'
+
+  - name: fct_conditions
+    config:
+      query_tags: '{"layer":"gold","dbt_layer":"marts","domain":"Clinical"}'
+
+  - name: fct_imaging_studies
+    config:
+      query_tags: '{"layer":"gold","dbt_layer":"marts","domain":"Clinical"}'
+
+  - name: fct_immunizations
+    config:
+      query_tags: '{"layer":"gold","dbt_layer":"marts","domain":"Clinical"}'
+
+  - name: fct_medications
+    config:
+      query_tags: '{"layer":"gold","dbt_layer":"marts","domain":"Clinical"}'
+
+  - name: fct_observations
+    config:
+      query_tags: '{"layer":"gold","dbt_layer":"marts","domain":"Clinical"}'
+
+  - name: fct_procedures
+    config:
+      query_tags: '{"layer":"gold","dbt_layer":"marts","domain":"Clinical"}'
+
+  - name: mart_allergy_registry
+    config:
+      query_tags: '{"layer":"gold","dbt_layer":"marts","domain":"Clinical"}'
+
+  - name: mart_care_plan_registry
+    config:
+      query_tags: '{"layer":"gold","dbt_layer":"marts","domain":"Clinical"}'
+
+  - name: mart_chronic_conditions
+    config:
+      query_tags: '{"layer":"gold","dbt_layer":"marts","domain":"Clinical"}'
+
+  - name: mart_imaging_by_modality
+    config:
+      query_tags: '{"layer":"gold","dbt_layer":"marts","domain":"Clinical"}'
+
+  - name: mart_medication_utilization
+    config:
+      query_tags: '{"layer":"gold","dbt_layer":"marts","domain":"Clinical"}'
+
+  - name: mart_population_health
+    config:
+      query_tags: '{"layer":"gold","dbt_layer":"marts","domain":"Population"}'
+
+  - name: mart_encounter_class_distribution
+    config:
+      query_tags: '{"layer":"gold","dbt_layer":"marts","domain":"Population"}'
+
+  - name: mart_immunization_coverage
+    config:
+      query_tags: '{"layer":"gold","dbt_layer":"marts","domain":"Population"}'

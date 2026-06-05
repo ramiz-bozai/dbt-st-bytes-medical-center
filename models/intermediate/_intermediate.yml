@@ -1,0 +1,38 @@
+version: 2
+
+models:
+  - name: int_patient_demographics
+    config:
+      query_tags: '{"layer":"silver","dbt_layer":"intermediate","domain":"Patient"}'
+
+  - name: int_encounters_enriched
+    config:
+      query_tags: '{"layer":"silver","dbt_layer":"intermediate","domain":"Operations"}'
+
+  - name: int_encounter_clinical_counts
+    config:
+      query_tags: '{"layer":"silver","dbt_layer":"intermediate","domain":"Operations"}'
+
+  - name: int_claim_financials
+    config:
+      query_tags: '{"layer":"silver","dbt_layer":"intermediate","domain":"Revenue cycle"}'
+
+  - name: int_claims_enriched
+    config:
+      query_tags: '{"layer":"silver","dbt_layer":"intermediate","domain":"Revenue cycle"}'
+
+  - name: int_claims_with_financials
+    config:
+      query_tags: '{"layer":"silver","dbt_layer":"intermediate","domain":"Revenue cycle"}'
+
+  - name: int_patient_active_conditions
+    config:
+      query_tags: '{"layer":"silver","dbt_layer":"intermediate","domain":"Clinical"}'
+
+  - name: int_observations_vitals
+    config:
+      query_tags: '{"layer":"silver","dbt_layer":"intermediate","domain":"Clinical"}'
+
+  - name: int_latest_vitals
+    config:
+      query_tags: '{"layer":"silver","dbt_layer":"intermediate","domain":"Clinical"}'

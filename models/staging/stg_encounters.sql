@@ -1,4 +1,4 @@
-with source as (select * from {{ source('bronze', 'raw_encounters') }})
+with source as (select * from {{ source('synthea_flat', 'raw_encounters') }})
 select
     id as encounter_id,
     {{ cast_to_timestamp("start") }} as encounter_start_at,

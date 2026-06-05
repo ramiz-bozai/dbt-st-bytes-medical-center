@@ -1,4 +1,4 @@
-with source as (select * from {{ source('bronze', 'raw_payer_transitions') }})
+with source as (select * from {{ source('synthea_flat', 'raw_payer_transitions') }})
 select
     patient as patient_id,
     memberid as member_id,

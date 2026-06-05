@@ -1,4 +1,4 @@
-with source as (select * from {{ source('bronze', 'raw_providers') }})
+with source as (select * from {{ source('synthea_flat', 'raw_providers') }})
 select
     id as provider_id,
     organization as organization_id,

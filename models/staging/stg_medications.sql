@@ -1,4 +1,4 @@
-with source as (select * from {{ source('bronze', 'raw_medications') }})
+with source as (select * from {{ source('synthea_flat', 'raw_medications') }})
 select
     {{ cast_to_timestamp("start") }} as medication_start_at,
     {{ cast_to_timestamp("stop") }} as medication_end_at,

@@ -1,4 +1,4 @@
-with source as (select * from {{ source('bronze', 'raw_claims_transactions') }})
+with source as (select * from {{ source('synthea_flat', 'raw_claims_transactions') }})
 select
     id as claim_transaction_id,
     claimid as claim_id,

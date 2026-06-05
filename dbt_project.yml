@@ -22,24 +22,21 @@ clean-targets:
 #   comment: "{{ query_comment_json() }}"
 #   append: true
 
-vars:
-  bronze_catalog: "{{ target.catalog }}"
-  bronze_schema: "raw"
+# vars:
+#   bronze_catalog: "{{ target.catalog }}"
+#   bronze_schema: "bronze"
 
 models:
   st_bytes_medical_center:
     staging:
       +schema: staging
-      +materialized: view
-      +query_tags: '{"layer":"bronze","domain":"healthcare"}'
+      +materialized: ephemeral
     intermediate:
       +schema: intermediate
-      +materialized: materialized_view
-      +query_tags: '{"layer":"silver","domain":"healthcare"}'
+      +materialized: table
     marts:
       +schema: marts
-      +materialized: materialized_view
-      +query_tags: '{"layer":"gold","domain":"healthcare"}'
+      +materialized: table
 
 seeds:
   st_bytes_medical_center:

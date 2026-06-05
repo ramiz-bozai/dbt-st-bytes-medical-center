@@ -1,10 +1,10 @@
 version: 2
 
 sources:
-  - name: bronze
-    description: Bronze ingest — Synthea CSVs loaded via dbt seed into the raw schema.
-    database: hls_amer_catalog
-    schema: raw_st_bytes_medical_center
+  - name: synthea_flat
+    description: Bronze ingest — Synthea CSVs loaded via dbt seed into the bronze schema.
+    database: st_bytes_medical_center_prod
+    schema: bronze
     tables:
       - name: raw_patients
       - name: raw_providers
@@ -18,9 +18,15 @@ sources:
       - name: raw_observations
       - name: raw_medications
       - name: raw_immunizations
-      - name: raw_allergies
       - name: raw_careplans
       - name: raw_devices
       - name: raw_supplies
       - name: raw_imaging_studies
       - name: raw_payer_transitions
+
+  - name: postgres_allergies
+    description: Tabular data on allergies from the postgres database.
+    database: postgres_st_bytes_catalog
+    schema: public
+    tables:
+      - name: raw_allergies

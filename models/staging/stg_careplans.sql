@@ -1,4 +1,4 @@
-with source as (select * from {{ source('bronze', 'raw_careplans') }})
+with source as (select * from {{ source('synthea_flat', 'raw_careplans') }})
 select
     id as care_plan_id,
     {{ cast_to_date("start") }} as care_plan_start_date,

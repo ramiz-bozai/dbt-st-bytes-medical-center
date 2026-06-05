@@ -1,3 +1,7 @@
+config(
+    enabled=false
+)
+
 -- Row counts across bronze sources (run after dbt seed)
 select 'raw_patients' as table_name, count(*) as row_count from {{ source('bronze', 'raw_patients') }}
 union all select 'raw_encounters', count(*) from {{ source('bronze', 'raw_encounters') }}

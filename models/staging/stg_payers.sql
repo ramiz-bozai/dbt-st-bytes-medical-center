@@ -1,4 +1,4 @@
-with source as (select * from {{ source('bronze', 'raw_payers') }})
+with source as (select * from {{ source('synthea_flat', 'raw_payers') }})
 select
     id as payer_id,
     name as payer_name,

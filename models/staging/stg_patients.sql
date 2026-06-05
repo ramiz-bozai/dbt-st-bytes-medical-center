@@ -1,5 +1,5 @@
 with source as (
-    select * from {{ source('bronze', 'raw_patients') }}
+    select * from {{ source('synthea_flat', 'raw_patients') }}
 ),
 renamed as (
     select

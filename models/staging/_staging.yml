@@ -3,33 +3,97 @@ version: 2
 models:
   - name: stg_patients
     description: Silver patient demographics (PII columns from bronze excluded downstream).
+    config:
+      query_tags: '{"layer":"silver","dbt_layer":"staging","domain":"Patient"}'
     columns:
       - name: patient_id
         tests: [unique, not_null]
+
   - name: stg_encounters
     description: Silver clinical encounters.
+    config:
+      query_tags: '{"layer":"silver","dbt_layer":"staging","domain":"Operations"}'
     columns:
       - name: encounter_id
         tests: [unique, not_null]
       - name: patient_id
         tests: [not_null]
-  - name: stg_claims
-    columns:
-      - name: claim_id
-        tests: [unique, not_null]
-  - name: stg_claims_transactions
-    columns:
-      - name: claim_transaction_id
-        tests: [unique, not_null]
+
   - name: stg_providers
+    config:
+      query_tags: '{"layer":"silver","dbt_layer":"staging","domain":"Operations"}'
     columns:
       - name: provider_id
         tests: [unique, not_null]
+
   - name: stg_organizations
+    config:
+      query_tags: '{"layer":"silver","dbt_layer":"staging","domain":"Operations"}'
     columns:
       - name: organization_id
         tests: [unique, not_null]
+
+  - name: stg_supplies
+    config:
+      query_tags: '{"layer":"silver","dbt_layer":"staging","domain":"Operations"}'
+
+  - name: stg_claims
+    config:
+      query_tags: '{"layer":"silver","dbt_layer":"staging","domain":"Revenue cycle"}'
+    columns:
+      - name: claim_id
+        tests: [unique, not_null]
+
+  - name: stg_claims_transactions
+    config:
+      query_tags: '{"layer":"silver","dbt_layer":"staging","domain":"Revenue cycle"}'
+    columns:
+      - name: claim_transaction_id
+        tests: [unique, not_null]
+
   - name: stg_payers
+    config:
+      query_tags: '{"layer":"silver","dbt_layer":"staging","domain":"Revenue cycle"}'
     columns:
       - name: payer_id
         tests: [unique, not_null]
+
+  - name: stg_payer_transitions
+    config:
+      query_tags: '{"layer":"silver","dbt_layer":"staging","domain":"Revenue cycle"}'
+
+  - name: stg_conditions
+    config:
+      query_tags: '{"layer":"silver","dbt_layer":"staging","domain":"Clinical"}'
+
+  - name: stg_procedures
+    config:
+      query_tags: '{"layer":"silver","dbt_layer":"staging","domain":"Clinical"}'
+
+  - name: stg_observations
+    config:
+      query_tags: '{"layer":"silver","dbt_layer":"staging","domain":"Clinical"}'
+
+  - name: stg_medications
+    config:
+      query_tags: '{"layer":"silver","dbt_layer":"staging","domain":"Clinical"}'
+
+  - name: stg_immunizations
+    config:
+      query_tags: '{"layer":"silver","dbt_layer":"staging","domain":"Clinical"}'
+
+  - name: stg_allergies
+    config:
+      query_tags: '{"layer":"silver","dbt_layer":"staging","domain":"Clinical"}'
+
+  - name: stg_careplans
+    config:
+      query_tags: '{"layer":"silver","dbt_layer":"staging","domain":"Clinical"}'
+
+  - name: stg_devices
+    config:
+      query_tags: '{"layer":"silver","dbt_layer":"staging","domain":"Clinical"}'
+
+  - name: stg_imaging_studies
+    config:
+      query_tags: '{"layer":"silver","dbt_layer":"staging","domain":"Clinical"}'

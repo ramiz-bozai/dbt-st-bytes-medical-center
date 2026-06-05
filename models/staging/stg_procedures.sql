@@ -1,4 +1,4 @@
-with source as (select * from {{ source('bronze', 'raw_procedures') }})
+with source as (select * from {{ source('synthea_flat', 'raw_procedures') }})
 select
     {{ cast_to_timestamp("start") }} as procedure_start_at,
     {{ cast_to_timestamp("stop") }} as procedure_end_at,

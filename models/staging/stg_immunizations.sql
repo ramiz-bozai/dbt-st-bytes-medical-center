@@ -1,4 +1,4 @@
-with source as (select * from {{ source('bronze', 'raw_immunizations') }})
+with source as (select * from {{ source('synthea_flat', 'raw_immunizations') }})
 select
     {{ cast_to_timestamp("date") }} as immunization_at,
     patient as patient_id,

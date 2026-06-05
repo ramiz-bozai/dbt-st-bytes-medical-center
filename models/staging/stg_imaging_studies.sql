@@ -1,4 +1,4 @@
-with source as (select * from {{ source('bronze', 'raw_imaging_studies') }})
+with source as (select * from {{ source('synthea_flat', 'raw_imaging_studies') }})
 select
     id as imaging_study_id,
     {{ cast_to_timestamp("date") }} as study_at,

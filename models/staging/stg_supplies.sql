@@ -1,4 +1,4 @@
-with source as (select * from {{ source('bronze', 'raw_supplies') }})
+with source as (select * from {{ source('synthea_flat', 'raw_supplies') }})
 select
     {{ cast_to_date("date") }} as supply_date,
     patient as patient_id,
