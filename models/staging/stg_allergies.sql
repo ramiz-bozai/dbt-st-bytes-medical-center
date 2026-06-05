@@ -1,3 +1,5 @@
+{{ config(materialized='ephemeral') }}
+
 with source as (select * from {{ source('postgres_allergies', 'raw_allergies') }})
 select
     start as allergy_start_date,

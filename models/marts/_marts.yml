@@ -3,8 +3,6 @@ version: 2
 models:
   - name: dim_patients
     description: "Gold patient dimension exposing derived demographics for analytics and joins."
-    config:
-      query_tags: '{"layer":"gold","dbt_layer":"marts","domain":"Patient"}'
     columns:
       - name: patient_id
         description: "Unique patient identifier (Synthea UUID)."
@@ -44,8 +42,6 @@ models:
 
   - name: dim_providers
     description: "Gold provider dimension with location and lifetime activity metrics."
-    config:
-      query_tags: '{"layer":"gold","dbt_layer":"marts","domain":"Operations"}'
     columns:
       - name: provider_id
         description: "Unique provider identifier."
@@ -70,8 +66,6 @@ models:
 
   - name: dim_organizations
     description: "Gold organization dimension with geolocation and utilization attributes."
-    config:
-      query_tags: '{"layer":"gold","dbt_layer":"marts","domain":"Operations"}'
     columns:
       - name: organization_id
         description: "Unique healthcare organization or facility identifier."
@@ -98,8 +92,6 @@ models:
 
   - name: dim_payers
     description: "Gold payer dimension with coverage and membership financial attributes."
-    config:
-      query_tags: '{"layer":"gold","dbt_layer":"marts","domain":"Revenue cycle"}'
     columns:
       - name: payer_id
         description: "Unique insurance payer identifier."
@@ -126,8 +118,6 @@ models:
 
   - name: fct_encounters
     description: "Gold encounter fact table with full enriched context for encounter-level analysis."
-    config:
-      query_tags: '{"layer":"gold","dbt_layer":"marts","domain":"Operations"}'
     columns:
       - name: encounter_id
         description: "Unique clinical encounter identifier."
@@ -197,8 +187,6 @@ models:
 
   - name: fct_claims
     description: "Gold claim fact combining enriched claim attributes with financial aggregates."
-    config:
-      query_tags: '{"layer":"gold","dbt_layer":"marts","domain":"Revenue cycle"}'
     columns:
       - name: claim_id
         description: "Unique claim header identifier."
@@ -250,8 +238,6 @@ models:
 
   - name: fct_claim_transactions
     description: "Gold claim transaction fact for revenue-cycle line-item analysis."
-    config:
-      query_tags: '{"layer":"gold","dbt_layer":"marts","domain":"Revenue cycle"}'
     columns:
       - name: claim_transaction_id
         description: "Unique claim financial transaction line identifier."
@@ -290,8 +276,6 @@ models:
 
   - name: fct_conditions
     description: "Gold condition fact table at diagnosis grain for clinical analytics."
-    config:
-      query_tags: '{"layer":"gold","dbt_layer":"marts","domain":"Clinical"}'
     columns:
       - name: condition_start_date
         description: "Condition onset date."
@@ -318,8 +302,6 @@ models:
 
   - name: fct_procedures
     description: "Gold procedure fact table at procedure-event grain."
-    config:
-      query_tags: '{"layer":"gold","dbt_layer":"marts","domain":"Clinical"}'
     columns:
       - name: procedure_start_at
         description: "Procedure start timestamp."
@@ -350,8 +332,6 @@ models:
 
   - name: fct_medications
     description: "Gold medication fact table at prescription grain."
-    config:
-      query_tags: '{"layer":"gold","dbt_layer":"marts","domain":"Clinical"}'
     columns:
       - name: medication_start_at
         description: "Medication period start timestamp."
@@ -390,8 +370,6 @@ models:
 
   - name: fct_observations
     description: "Gold observation fact table at observation grain."
-    config:
-      query_tags: '{"layer":"gold","dbt_layer":"marts","domain":"Clinical"}'
     columns:
       - name: observation_at
         description: "Observation collection timestamp."
@@ -420,8 +398,6 @@ models:
 
   - name: fct_immunizations
     description: "Gold immunization fact table at dose-administration grain."
-    config:
-      query_tags: '{"layer":"gold","dbt_layer":"marts","domain":"Clinical"}'
     columns:
       - name: immunization_at
         description: "Immunization administration timestamp."
@@ -444,8 +420,6 @@ models:
 
   - name: fct_allergies
     description: "Gold allergy fact table at allergy-record grain."
-    config:
-      query_tags: '{"layer":"gold","dbt_layer":"marts","domain":"Clinical"}'
     columns:
       - name: allergy_start_date
         description: "Allergy or intolerance onset date."
@@ -476,8 +450,6 @@ models:
 
   - name: fct_care_plans
     description: "Gold care plan fact table at care-plan grain."
-    config:
-      query_tags: '{"layer":"gold","dbt_layer":"marts","domain":"Clinical"}'
     columns:
       - name: care_plan_id
         description: "Unique care plan identifier."
@@ -508,8 +480,6 @@ models:
 
   - name: fct_imaging_studies
     description: "Gold imaging study fact table at DICOM instance grain."
-    config:
-      query_tags: '{"layer":"gold","dbt_layer":"marts","domain":"Clinical"}'
     columns:
       - name: imaging_study_id
         description: "Unique imaging study identifier."
@@ -546,8 +516,6 @@ models:
 
   - name: mart_patient_summary
     description: "One row per patient combining demographics, utilization, conditions, and financial rollups."
-    config:
-      query_tags: '{"layer":"gold","dbt_layer":"marts","domain":"Patient"}'
     columns:
       - name: patient_id
         description: "Unique patient identifier (Synthea UUID)."
@@ -607,8 +575,6 @@ models:
 
   - name: mart_encounter_cost_analysis
     description: "Encounter-level cost analysis joined with clinical activity counts."
-    config:
-      query_tags: '{"layer":"gold","dbt_layer":"marts","domain":"Operations"}'
     columns:
       - name: encounter_id
         description: "Unique clinical encounter identifier."
@@ -645,8 +611,6 @@ models:
 
   - name: mart_provider_panel
     description: "Provider panel metrics aggregating encounters, patients, costs, and duration."
-    config:
-      query_tags: '{"layer":"gold","dbt_layer":"marts","domain":"Operations"}'
     columns:
       - name: provider_id
         description: "Unique provider identifier."
@@ -669,8 +633,6 @@ models:
 
   - name: mart_organization_utilization
     description: "Organization utilization summary with encounter volume and claim costs."
-    config:
-      query_tags: '{"layer":"gold","dbt_layer":"marts","domain":"Operations"}'
     columns:
       - name: organization_id
         description: "Unique healthcare organization or facility identifier."
@@ -693,8 +655,6 @@ models:
 
   - name: mart_payer_financials
     description: "Payer financial summary linking payer attributes to encounter and medication coverage."
-    config:
-      query_tags: '{"layer":"gold","dbt_layer":"marts","domain":"Revenue cycle"}'
     columns:
       - name: payer_id
         description: "Unique insurance payer identifier."
@@ -717,8 +677,6 @@ models:
 
   - name: mart_population_health
     description: "Population health cohort metrics grouped by age band, gender, and state."
-    config:
-      query_tags: '{"layer":"gold","dbt_layer":"marts","domain":"Population"}'
     columns:
       - name: age_band
         description: "Patient age segment (pediatric, adult, senior, or deceased)."
@@ -739,8 +697,6 @@ models:
 
   - name: mart_revenue_cycle
     description: "Revenue-cycle summary aggregating claim transactions by transaction type."
-    config:
-      query_tags: '{"layer":"gold","dbt_layer":"marts","domain":"Revenue cycle"}'
     columns:
       - name: transaction_type
         description: "Claim transaction category (for example charge, payment, adjustment)."
@@ -755,8 +711,6 @@ models:
 
   - name: mart_chronic_conditions
     description: "Condition prevalence report with patient and active-record counts per diagnosis."
-    config:
-      query_tags: '{"layer":"gold","dbt_layer":"marts","domain":"Clinical"}'
     columns:
       - name: condition_code
         description: "Diagnosis or condition code."
@@ -771,8 +725,6 @@ models:
 
   - name: mart_medication_utilization
     description: "Medication utilization and cost summary grouped by drug code."
-    config:
-      query_tags: '{"layer":"gold","dbt_layer":"marts","domain":"Clinical"}'
     columns:
       - name: medication_code
         description: "Medication product code."
@@ -791,8 +743,6 @@ models:
 
   - name: mart_immunization_coverage
     description: "Immunization coverage summary with dose and patient counts per vaccine."
-    config:
-      query_tags: '{"layer":"gold","dbt_layer":"marts","domain":"Population"}'
     columns:
       - name: immunization_code
         description: "Immunization product code."
@@ -807,8 +757,6 @@ models:
 
   - name: mart_encounter_class_distribution
     description: "Encounter volume and cost distribution by encounter class."
-    config:
-      query_tags: '{"layer":"gold","dbt_layer":"marts","domain":"Population"}'
     columns:
       - name: encounter_class
         description: "Encounter setting or class (for example ambulatory, emergency, inpatient)."
@@ -825,8 +773,6 @@ models:
 
   - name: mart_imaging_by_modality
     description: "Imaging volume summary grouped by modality and body site."
-    config:
-      query_tags: '{"layer":"gold","dbt_layer":"marts","domain":"Clinical"}'
     columns:
       - name: modality_code
         description: "Imaging modality code."
@@ -843,8 +789,6 @@ models:
 
   - name: mart_vital_signs_latest
     description: "Latest vital-sign values per patient for clinical dashboards."
-    config:
-      query_tags: '{"layer":"gold","dbt_layer":"marts","domain":"Patient"}'
     columns:
       - name: patient_id
         description: "Unique patient identifier (Synthea UUID)."
@@ -861,8 +805,6 @@ models:
 
   - name: mart_claims_aging
     description: "Claims aging summary by primary status with outstanding balance metrics."
-    config:
-      query_tags: '{"layer":"gold","dbt_layer":"marts","domain":"Revenue cycle"}'
     columns:
       - name: status_primary
         description: "Primary payer claim status."
@@ -875,8 +817,6 @@ models:
 
   - name: mart_allergy_registry
     description: "Patient allergy registry with key clinical attributes for safety reporting."
-    config:
-      query_tags: '{"layer":"gold","dbt_layer":"marts","domain":"Clinical"}'
     columns:
       - name: patient_id
         description: "Unique patient identifier (Synthea UUID)."
@@ -895,8 +835,6 @@ models:
 
   - name: mart_care_plan_registry
     description: "Care plan registry for care-management and coordination reporting."
-    config:
-      query_tags: '{"layer":"gold","dbt_layer":"marts","domain":"Clinical"}'
     columns:
       - name: care_plan_id
         description: "Unique care plan identifier."
@@ -927,8 +865,6 @@ models:
 
   - name: mart_patient_coverage_timeline
     description: "Patient insurance coverage timeline with date-bounded payer transitions."
-    config:
-      query_tags: '{"layer":"gold","dbt_layer":"marts","domain":"Patient"}'
     columns:
       - name: patient_id
         description: "Unique patient identifier (Synthea UUID)."
@@ -947,8 +883,6 @@ models:
 
   - name: mv_revenue_cycle_kpis
     description: "Materialized-view BI layer for revenue-cycle KPIs with network share and ranking."
-    config:
-      query_tags: '{"layer":"gold","dbt_layer":"marts","domain":"Revenue cycle"}'
     columns:
       - name: transaction_type
         description: "Claim transaction category (for example charge, payment, adjustment)."
@@ -969,8 +903,6 @@ models:
 
   - name: mv_encounter_volume_by_class
     description: "Materialized-view BI layer for encounter mix by class with share-of-total and rank."
-    config:
-      query_tags: '{"layer":"gold","dbt_layer":"marts","domain":"Population"}'
     columns:
       - name: encounter_class
         description: "Encounter setting or class (for example ambulatory, emergency, inpatient)."

@@ -3,8 +3,6 @@ version: 2
 models:
   - name: int_patient_demographics
     description: "Derives patient age, mortality flag, and age-band segmentation from staged patients."
-    config:
-      query_tags: '{"layer":"silver","dbt_layer":"intermediate","domain":"Patient"}'
     columns:
       - name: patient_id
         description: "Unique patient identifier (Synthea UUID)."
@@ -43,8 +41,6 @@ models:
 
   - name: int_observations_vitals
     description: "Filters vital-sign observations and casts values to numeric where parseable."
-    config:
-      query_tags: '{"layer":"silver","dbt_layer":"intermediate","domain":"Clinical"}'
     columns:
       - name: patient_id
         description: "Unique patient identifier (Synthea UUID)."
@@ -63,8 +59,6 @@ models:
 
   - name: int_latest_vitals
     description: "Returns the most recent vital-sign reading per patient and observation code."
-    config:
-      query_tags: '{"layer":"silver","dbt_layer":"intermediate","domain":"Clinical"}'
     columns:
       - name: patient_id
         description: "Unique patient identifier (Synthea UUID)."
@@ -85,8 +79,6 @@ models:
 
   - name: int_patient_active_conditions
     description: "Aggregates active conditions per patient into a count and description set."
-    config:
-      query_tags: '{"layer":"silver","dbt_layer":"intermediate","domain":"Clinical"}'
     columns:
       - name: patient_id
         description: "Unique patient identifier (Synthea UUID)."
@@ -97,8 +89,6 @@ models:
 
   - name: int_encounter_clinical_counts
     description: "Rolls up clinical activity counts and costs per encounter across clinical domains."
-    config:
-      query_tags: '{"layer":"silver","dbt_layer":"intermediate","domain":"Operations"}'
     columns:
       - name: encounter_id
         description: "Unique clinical encounter identifier."
@@ -121,8 +111,6 @@ models:
 
   - name: int_claim_financials
     description: "Aggregates claim transaction lines into charge, payment, transfer, and balance metrics."
-    config:
-      query_tags: '{"layer":"silver","dbt_layer":"intermediate","domain":"Revenue cycle"}'
     columns:
       - name: claim_id
         description: "Unique claim header identifier."
@@ -147,8 +135,6 @@ models:
 
   - name: int_claims_enriched
     description: "Enriches claims with encounter class, dates, and organization from encounters."
-    config:
-      query_tags: '{"layer":"silver","dbt_layer":"intermediate","domain":"Revenue cycle"}'
     columns:
       - name: claim_id
         description: "Unique claim header identifier."
@@ -185,8 +171,6 @@ models:
 
   - name: int_claims_with_financials
     description: "Joins enriched claims with aggregated financials and computes net balance."
-    config:
-      query_tags: '{"layer":"silver","dbt_layer":"intermediate","domain":"Revenue cycle"}'
     columns:
       - name: claim_id
         description: "Unique claim header identifier."
@@ -237,8 +221,6 @@ models:
 
   - name: int_encounters_enriched
     description: "Enriches encounters with patient demographics, provider, organization, and payer context."
-    config:
-      query_tags: '{"layer":"silver","dbt_layer":"intermediate","domain":"Operations"}'
     columns:
       - name: encounter_id
         description: "Unique clinical encounter identifier."

@@ -1,4 +1,3 @@
-with source as (select * from {{ source('synthea_flat', 'raw_medications') }})
 select
     {{ cast_to_timestamp("start") }} as medication_start_at,
     {{ cast_to_timestamp("stop") }} as medication_end_at,
@@ -17,4 +16,4 @@ select
     {{ cast_to_timestamp("_ingested_at") }} as ingested_at,
     _source_system as source_system,
     _row_hash as row_hash
-from source
+{{ stream_read_synthea_csv('medications.csv') }}
