@@ -1,8 +1,4 @@
-with source as (
-    select * from {{ source('synthea_flat', 'raw_patients') }}
-),
-renamed as (
-    select
+select
         id as patient_id,
         {{ cast_to_date("birthdate") }} as birth_date,
         {{ cast_to_date("deathdate") }} as death_date,
@@ -30,6 +26,5 @@ renamed as (
         {{ cast_to_timestamp("_ingested_at") }} as ingested_at,
         _source_system as source_system,
         _row_hash as row_hash
-    from source
-)
-select * from renamed
+    
+{{ stream_read_synthea_csv('patients.csv') }}

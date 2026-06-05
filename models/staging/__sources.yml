@@ -1,10 +1,16 @@
 version: 2
 
+# Synthea CSVs are ingested directly in staging streaming tables via read_files()
+# from the Unity Catalog volume (see stream_read_synthea_csv macro).
+
 sources:
-  - name: synthea_flat
-    description: Bronze ingest — Synthea CSVs loaded via dbt seed into the bronze schema.
-    database: st_bytes_medical_center_prod
-    schema: bronze
+  - name: synthea_volume
+    description: >
+      Synthea CSV exports in Unity Catalog volume
+      /Volumes/ramiz_fevm_catalog/raw_uploads/synthea_csv.
+      Staging models ingest via stream read_files().
+    database: ramiz_fevm_catalog
+    schema: staging
     tables:
       - name: raw_patients
       - name: raw_providers

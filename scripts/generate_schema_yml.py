@@ -362,8 +362,6 @@ def render_model(model: dict) -> list[str]:
     lines = [
         f"  - name: {model['name']}",
         f"    description: {yaml_quote(model['purpose'])}",
-        "    config:",
-        f"      query_tags: '{model['tags']}'",
         "    columns:",
     ]
     tests = model.get("tests", {})

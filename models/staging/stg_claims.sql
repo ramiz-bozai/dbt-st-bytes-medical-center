@@ -1,4 +1,3 @@
-with source as (select * from {{ source('synthea_flat', 'raw_claims') }})
 select
     id as claim_id,
     patientid as patient_id,
@@ -22,4 +21,4 @@ select
     {{ cast_to_timestamp("_ingested_at") }} as ingested_at,
     _source_system as source_system,
     _row_hash as row_hash
-from source
+{{ stream_read_synthea_csv('claims.csv') }}

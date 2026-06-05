@@ -1,4 +1,3 @@
-with source as (select * from {{ source('synthea_flat', 'raw_encounters') }})
 select
     id as encounter_id,
     {{ cast_to_timestamp("start") }} as encounter_start_at,
@@ -18,4 +17,4 @@ select
     {{ cast_to_timestamp("_ingested_at") }} as ingested_at,
     _source_system as source_system,
     _row_hash as row_hash
-from source
+{{ stream_read_synthea_csv('encounters.csv') }}

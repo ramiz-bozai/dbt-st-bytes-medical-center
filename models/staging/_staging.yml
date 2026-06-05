@@ -3,8 +3,6 @@ version: 2
 models:
   - name: stg_allergies
     description: "Cleans and standardizes raw allergy records from Postgres with typed columns and an active-status flag."
-    config:
-      query_tags: '{"layer":"silver","dbt_layer":"staging","domain":"Clinical"}'
     columns:
       - name: allergy_start_date
         description: "Allergy or intolerance onset date."
@@ -35,8 +33,6 @@ models:
 
   - name: stg_supplies
     description: "Stages supply usage events with renamed keys and typed dates and quantities."
-    config:
-      query_tags: '{"layer":"silver","dbt_layer":"staging","domain":"Operations"}'
     columns:
       - name: supply_date
         description: "Supply usage date."
@@ -59,8 +55,6 @@ models:
 
   - name: stg_providers
     description: "Stages provider master data with renamed identifiers, geolocation, and lifetime activity counts."
-    config:
-      query_tags: '{"layer":"silver","dbt_layer":"staging","domain":"Operations"}'
     columns:
       - name: provider_id
         description: "Unique provider identifier."
@@ -98,8 +92,6 @@ models:
 
   - name: stg_procedures
     description: "Stages clinical procedure events with standardized timestamps, codes, and costs."
-    config:
-      query_tags: '{"layer":"silver","dbt_layer":"staging","domain":"Clinical"}'
     columns:
       - name: procedure_start_at
         description: "Procedure start timestamp."
@@ -130,8 +122,6 @@ models:
 
   - name: stg_payers
     description: "Stages payer and insurer attributes with financial and membership aggregates."
-    config:
-      query_tags: '{"layer":"silver","dbt_layer":"staging","domain":"Revenue cycle"}'
     columns:
       - name: payer_id
         description: "Unique insurance payer identifier."
@@ -165,8 +155,6 @@ models:
 
   - name: stg_payer_transitions
     description: "Stages patient insurance coverage transition periods and plan ownership."
-    config:
-      query_tags: '{"layer":"silver","dbt_layer":"staging","domain":"Revenue cycle"}'
     columns:
       - name: patient_id
         description: "Unique patient identifier (Synthea UUID)."
@@ -193,8 +181,6 @@ models:
 
   - name: stg_patients
     description: "Stages patient demographics and socioeconomic attributes with renamed and typed fields."
-    config:
-      query_tags: '{"layer":"silver","dbt_layer":"staging","domain":"Patient"}'
     columns:
       - name: patient_id
         description: "Unique patient identifier (Synthea UUID)."
@@ -254,8 +240,6 @@ models:
 
   - name: stg_organizations
     description: "Stages healthcare organization master data with location and utilization metrics."
-    config:
-      query_tags: '{"layer":"silver","dbt_layer":"staging","domain":"Operations"}'
     columns:
       - name: organization_id
         description: "Unique healthcare organization or facility identifier."
@@ -289,8 +273,6 @@ models:
 
   - name: stg_observations
     description: "Stages clinical observations such as labs and vitals with trimmed categories and typed timestamps."
-    config:
-      query_tags: '{"layer":"silver","dbt_layer":"staging","domain":"Clinical"}'
     columns:
       - name: observation_at
         description: "Observation collection timestamp."
@@ -319,8 +301,6 @@ models:
 
   - name: stg_medications
     description: "Stages medication prescriptions with costs, coverage, and an active-status flag."
-    config:
-      query_tags: '{"layer":"silver","dbt_layer":"staging","domain":"Clinical"}'
     columns:
       - name: medication_start_at
         description: "Medication period start timestamp."
@@ -359,8 +339,6 @@ models:
 
   - name: stg_immunizations
     description: "Stages immunization administration events with product codes and costs."
-    config:
-      query_tags: '{"layer":"silver","dbt_layer":"staging","domain":"Clinical"}'
     columns:
       - name: immunization_at
         description: "Immunization administration timestamp."
@@ -383,8 +361,6 @@ models:
 
   - name: stg_imaging_studies
     description: "Stages imaging study instances with modality, body site, and DICOM identifiers."
-    config:
-      query_tags: '{"layer":"silver","dbt_layer":"staging","domain":"Clinical"}'
     columns:
       - name: imaging_study_id
         description: "Unique imaging study identifier."
@@ -421,8 +397,6 @@ models:
 
   - name: stg_encounters
     description: "Stages patient encounter events with class, cost, and linked entity foreign keys."
-    config:
-      query_tags: '{"layer":"silver","dbt_layer":"staging","domain":"Operations"}'
     columns:
       - name: encounter_id
         description: "Unique clinical encounter identifier."
@@ -465,8 +439,6 @@ models:
 
   - name: stg_devices
     description: "Stages medical device usage records with UDI and in-use status."
-    config:
-      query_tags: '{"layer":"silver","dbt_layer":"staging","domain":"Clinical"}'
     columns:
       - name: device_start_at
         description: "Device usage start timestamp."
@@ -493,8 +465,6 @@ models:
 
   - name: stg_conditions
     description: "Stages diagnosis and condition records with an active-status flag derived from end date."
-    config:
-      query_tags: '{"layer":"silver","dbt_layer":"staging","domain":"Clinical"}'
     columns:
       - name: condition_start_date
         description: "Condition onset date."
@@ -521,8 +491,6 @@ models:
 
   - name: stg_claims_transactions
     description: "Stages claim financial transaction line items including charges, payments, and transfers."
-    config:
-      query_tags: '{"layer":"silver","dbt_layer":"staging","domain":"Revenue cycle"}'
     columns:
       - name: claim_transaction_id
         description: "Unique claim financial transaction line identifier."
@@ -594,8 +562,6 @@ models:
 
   - name: stg_claims
     description: "Stages claim headers with diagnoses, statuses, and outstanding balances."
-    config:
-      query_tags: '{"layer":"silver","dbt_layer":"staging","domain":"Revenue cycle"}'
     columns:
       - name: claim_id
         description: "Unique claim header identifier."
@@ -657,8 +623,6 @@ models:
 
   - name: stg_careplans
     description: "Stages patient care plan records with an active-status flag."
-    config:
-      query_tags: '{"layer":"silver","dbt_layer":"staging","domain":"Clinical"}'
     columns:
       - name: care_plan_id
         description: "Unique care plan identifier."
