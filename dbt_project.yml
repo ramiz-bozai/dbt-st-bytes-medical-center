@@ -28,6 +28,9 @@ clean-targets:
 
 models:
   st_bytes_medical_center:
+    +persist_docs:
+      relation: true
+      columns: true
     staging:
       +schema: staging
       +materialized: ephemeral
@@ -40,6 +43,9 @@ models:
 
 seeds:
   st_bytes_medical_center:
+    +persist_docs:
+      relation: true
+      columns: true
     st_bytes_medical_center:
       +schema: raw_st_bytes_medical_center
       patients:
