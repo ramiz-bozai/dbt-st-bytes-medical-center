@@ -1,0 +1,25 @@
+with source as (select * from {{ source('synthea_flat', 'raw_claims') }})
+select
+    id as claim_id,
+    patientid as patient_id,
+    providerid as provider_id,
+    primarypatientinsuranceid as primary_insurance_id,
+    secondarypatientinsuranceid as secondary_insurance_id,
+    departmentid as department_id,
+    patientdepartmentid as patient_department_id,
+    diagnosis1, diagnosis2, diagnosis3, diagnosis4,
+    diagnosis5, diagnosis6, diagnosis7, diagnosis8,
+    appointmentid as encounter_id,
+    {{ cast_to_timestamp("currentillnessdate") }} as illness_onset_at,
+    {{ cast_to_timestamp("servicedate") }} as service_at,
+    supervisingproviderid as supervising_provider_id,
+    status1 as status_primary,
+    status2 as status_secondary,
+    statusp as status_patient,
+    {{ cast_to_double("outstanding1") }} as outstanding_primary,
+    {{ cast_to_double("outstanding2") }} as outstanding_secondary,
+    {{ cast_to_double("outstandingp") }} as outstanding_patient,
+    {{ cast_to_timestamp("_ingested_at") }} as ingested_at,
+    _source_system as source_system,
+    _row_hash as row_hash
+from source

@@ -1,0 +1,300 @@
+version: 2
+
+models:
+  - name: int_patient_demographics
+    description: "Derives patient age, mortality flag, and age-band segmentation from staged patients."
+    config:
+      query_tags: '{"layer":"silver","dbt_layer":"intermediate","domain":"Patient"}'
+    columns:
+      - name: patient_id
+        description: "Unique patient identifier (Synthea UUID)."
+      - name: birth_date
+        description: "Patient date of birth."
+      - name: death_date
+        description: "Patient date of death, if recorded."
+      - name: first_name
+        description: "Patient given name."
+      - name: last_name
+        description: "Patient family name."
+      - name: gender
+        description: "Patient gender."
+      - name: race
+        description: "Patient race category from source data."
+      - name: ethnicity
+        description: "Patient ethnicity category from source data."
+      - name: city
+        description: "City name."
+      - name: state
+        description: "State or region code."
+      - name: zip
+        description: "Postal or ZIP code."
+      - name: annual_income
+        description: "Estimated annual household income."
+      - name: lifetime_healthcare_expenses
+        description: "Lifetime healthcare expenses attributed to the patient."
+      - name: lifetime_coverage_amount
+        description: "Lifetime insurance coverage amount attributed to the patient."
+      - name: is_alive
+        description: "True when the patient has no recorded death date."
+      - name: age_years
+        description: "Patient age in whole years at reference date or death."
+      - name: age_band
+        description: "Patient age segment (pediatric, adult, senior, or deceased)."
+
+  - name: int_observations_vitals
+    description: "Filters vital-sign observations and casts values to numeric where parseable."
+    config:
+      query_tags: '{"layer":"silver","dbt_layer":"intermediate","domain":"Clinical"}'
+    columns:
+      - name: patient_id
+        description: "Unique patient identifier (Synthea UUID)."
+      - name: encounter_id
+        description: "Unique clinical encounter identifier."
+      - name: observation_at
+        description: "Observation collection timestamp."
+      - name: observation_code
+        description: "Observation code from the source vocabulary."
+      - name: observation_description
+        description: "Human-readable observation description."
+      - name: observation_value_numeric
+        description: "Numeric observation result when parseable."
+      - name: units
+        description: "Unit of measure for the observation result."
+
+  - name: int_latest_vitals
+    description: "Returns the most recent vital-sign reading per patient and observation code."
+    config:
+      query_tags: '{"layer":"silver","dbt_layer":"intermediate","domain":"Clinical"}'
+    columns:
+      - name: patient_id
+        description: "Unique patient identifier (Synthea UUID)."
+      - name: encounter_id
+        description: "Unique clinical encounter identifier."
+      - name: observation_at
+        description: "Observation collection timestamp."
+      - name: observation_code
+        description: "Observation code from the source vocabulary."
+      - name: observation_description
+        description: "Human-readable observation description."
+      - name: observation_value_numeric
+        description: "Numeric observation result when parseable."
+      - name: units
+        description: "Unit of measure for the observation result."
+      - name: recency_rank
+        description: "Recency rank where 1 is the latest reading per patient and code."
+
+  - name: int_patient_active_conditions
+    description: "Aggregates active conditions per patient into a count and description set."
+    config:
+      query_tags: '{"layer":"silver","dbt_layer":"intermediate","domain":"Clinical"}'
+    columns:
+      - name: patient_id
+        description: "Unique patient identifier (Synthea UUID)."
+      - name: active_condition_count
+        description: "Count of active conditions for the patient."
+      - name: active_condition_descriptions
+        description: "Set of active condition descriptions for the patient."
+
+  - name: int_encounter_clinical_counts
+    description: "Rolls up clinical activity counts and costs per encounter across clinical domains."
+    config:
+      query_tags: '{"layer":"silver","dbt_layer":"intermediate","domain":"Operations"}'
+    columns:
+      - name: encounter_id
+        description: "Unique clinical encounter identifier."
+      - name: patient_id
+        description: "Unique patient identifier (Synthea UUID)."
+      - name: condition_count
+        description: "Count of conditions linked to the encounter."
+      - name: procedure_count
+        description: "Count of procedures linked to the encounter."
+      - name: procedure_cost
+        description: "Total procedure cost linked to the encounter."
+      - name: observation_count
+        description: "Count of observations linked to the encounter."
+      - name: medication_count
+        description: "Count of medication orders linked to the encounter."
+      - name: medication_cost
+        description: "Total medication cost linked to the encounter."
+      - name: immunization_count
+        description: "Count of immunizations linked to the encounter."
+
+  - name: int_claim_financials
+    description: "Aggregates claim transaction lines into charge, payment, transfer, and balance metrics."
+    config:
+      query_tags: '{"layer":"silver","dbt_layer":"intermediate","domain":"Revenue cycle"}'
+    columns:
+      - name: claim_id
+        description: "Unique claim header identifier."
+      - name: patient_id
+        description: "Unique patient identifier (Synthea UUID)."
+      - name: transaction_line_count
+        description: "Number of financial transaction lines for the claim."
+      - name: total_charges
+        description: "Sum of charge amounts for the claim."
+      - name: total_payments
+        description: "Sum of payment amounts for the claim."
+      - name: total_transfer_out
+        description: "Sum of outbound transfer amounts for the claim."
+      - name: total_transfer_in
+        description: "Sum of inbound transfer amounts for the claim."
+      - name: max_outstanding
+        description: "Maximum outstanding balance observed on claim transactions."
+      - name: first_service_date
+        description: "Earliest service date on claim transactions."
+      - name: last_service_date
+        description: "Latest service date on claim transactions."
+
+  - name: int_claims_enriched
+    description: "Enriches claims with encounter class, dates, and organization from encounters."
+    config:
+      query_tags: '{"layer":"silver","dbt_layer":"intermediate","domain":"Revenue cycle"}'
+    columns:
+      - name: claim_id
+        description: "Unique claim header identifier."
+      - name: patient_id
+        description: "Unique patient identifier (Synthea UUID)."
+      - name: provider_id
+        description: "Unique provider identifier."
+      - name: encounter_id
+        description: "Unique clinical encounter identifier."
+      - name: service_at
+        description: "Primary service timestamp on the claim."
+      - name: service_date
+        description: "Service date derived from the claim or transaction."
+      - name: status_primary
+        description: "Primary payer claim status."
+      - name: status_secondary
+        description: "Secondary payer claim status."
+      - name: outstanding_primary
+        description: "Outstanding balance for the primary payer."
+      - name: outstanding_secondary
+        description: "Outstanding balance for the secondary payer."
+      - name: diagnosis1
+        description: "Primary diagnosis code on the claim."
+      - name: diagnosis2
+        description: "Secondary diagnosis code on the claim."
+      - name: diagnosis3
+        description: "Tertiary diagnosis code on the claim."
+      - name: encounter_class
+        description: "Encounter setting or class (for example ambulatory, emergency, inpatient)."
+      - name: encounter_start_date
+        description: "Encounter start date."
+      - name: organization_id
+        description: "Unique healthcare organization or facility identifier."
+
+  - name: int_claims_with_financials
+    description: "Joins enriched claims with aggregated financials and computes net balance."
+    config:
+      query_tags: '{"layer":"silver","dbt_layer":"intermediate","domain":"Revenue cycle"}'
+    columns:
+      - name: claim_id
+        description: "Unique claim header identifier."
+      - name: patient_id
+        description: "Unique patient identifier (Synthea UUID)."
+      - name: provider_id
+        description: "Unique provider identifier."
+      - name: encounter_id
+        description: "Unique clinical encounter identifier."
+      - name: service_at
+        description: "Primary service timestamp on the claim."
+      - name: service_date
+        description: "Service date derived from the claim or transaction."
+      - name: status_primary
+        description: "Primary payer claim status."
+      - name: status_secondary
+        description: "Secondary payer claim status."
+      - name: outstanding_primary
+        description: "Outstanding balance for the primary payer."
+      - name: outstanding_secondary
+        description: "Outstanding balance for the secondary payer."
+      - name: diagnosis1
+        description: "Primary diagnosis code on the claim."
+      - name: diagnosis2
+        description: "Secondary diagnosis code on the claim."
+      - name: diagnosis3
+        description: "Tertiary diagnosis code on the claim."
+      - name: encounter_class
+        description: "Encounter setting or class (for example ambulatory, emergency, inpatient)."
+      - name: encounter_start_date
+        description: "Encounter start date."
+      - name: organization_id
+        description: "Unique healthcare organization or facility identifier."
+      - name: transaction_line_count
+        description: "Number of financial transaction lines for the claim."
+      - name: total_charges
+        description: "Sum of charge amounts for the claim."
+      - name: total_payments
+        description: "Sum of payment amounts for the claim."
+      - name: total_transfer_out
+        description: "Sum of outbound transfer amounts for the claim."
+      - name: total_transfer_in
+        description: "Sum of inbound transfer amounts for the claim."
+      - name: max_outstanding
+        description: "Maximum outstanding balance observed on claim transactions."
+      - name: net_balance
+        description: "Net financial balance after charges, payments, and transfers."
+
+  - name: int_encounters_enriched
+    description: "Enriches encounters with patient demographics, provider, organization, and payer context."
+    config:
+      query_tags: '{"layer":"silver","dbt_layer":"intermediate","domain":"Operations"}'
+    columns:
+      - name: encounter_id
+        description: "Unique clinical encounter identifier."
+      - name: patient_id
+        description: "Unique patient identifier (Synthea UUID)."
+      - name: provider_id
+        description: "Unique provider identifier."
+      - name: organization_id
+        description: "Unique healthcare organization or facility identifier."
+      - name: payer_id
+        description: "Unique insurance payer identifier."
+      - name: encounter_class
+        description: "Encounter setting or class (for example ambulatory, emergency, inpatient)."
+      - name: encounter_code
+        description: "Encounter type code from the source vocabulary."
+      - name: encounter_description
+        description: "Human-readable encounter type description."
+      - name: encounter_start_date
+        description: "Encounter start date."
+      - name: encounter_start_at
+        description: "Encounter start timestamp."
+      - name: encounter_end_at
+        description: "Encounter end timestamp."
+      - name: encounter_duration_minutes
+        description: "Encounter length in minutes."
+      - name: base_encounter_cost
+        description: "Base cost attributed to the encounter in source currency."
+      - name: total_claim_cost
+        description: "Total claim cost linked to the encounter."
+      - name: payer_coverage_amount
+        description: "Amount covered by insurance for the encounter or item."
+      - name: reason_code
+        description: "Clinical or administrative reason code."
+      - name: reason_description
+        description: "Human-readable reason description."
+      - name: age_years
+        description: "Patient age in whole years at reference date or death."
+      - name: age_band
+        description: "Patient age segment (pediatric, adult, senior, or deceased)."
+      - name: patient_gender
+        description: "Patient gender carried on the encounter context."
+      - name: patient_state
+        description: "Patient state of residence carried on the encounter context."
+      - name: is_alive
+        description: "True when the patient has no recorded death date."
+      - name: provider_name
+        description: "Provider display name."
+      - name: provider_specialty
+        description: "Clinical specialty of the encounter provider."
+      - name: organization_name
+        description: "Organization or facility display name."
+      - name: org_city
+        description: "City of the organization location."
+      - name: org_state
+        description: "State of the organization location."
+      - name: payer_name
+        description: "Payer display name."
+      - name: payer_ownership
+        description: "Payer ownership or plan type classification."
