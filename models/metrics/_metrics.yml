@@ -1,0 +1,35 @@
+version: 2
+
+models:
+  - name: metric_rc_transactions
+    description: >
+      Revenue cycle metric view at claim-transaction line grain. Use for charge,
+      payment, adjustment, and outstanding questions by service date, transaction
+      type, payment method, or procedure code. Dimensions and measures are documented
+      in the metric view YAML (Unity Catalog comments).
+    meta:
+      domain: Revenue cycle
+      grain: transaction_line
+      genie_space: St. Bytes Revenue Cycle
+
+  - name: metric_rc_claims
+    description: >
+      Revenue cycle metric view at claim grain. Use for claim status, outstanding
+      balances, charges vs payments, and net balance by service date or encounter
+      class. Dimensions and measures are documented in the metric view YAML
+      (Unity Catalog comments).
+    meta:
+      domain: Revenue cycle
+      grain: claim
+      genie_space: St. Bytes Revenue Cycle
+
+  - name: metric_rc_encounter_costs
+    description: >
+      Revenue cycle metric view at encounter grain. Use for cost, coverage, and
+      clinical cost driver analysis by organization, provider, payer, or care
+      setting. Dimensions and measures are documented in the metric view YAML
+      (Unity Catalog comments).
+    meta:
+      domain: Revenue cycle
+      grain: encounter
+      genie_space: St. Bytes Revenue Cycle

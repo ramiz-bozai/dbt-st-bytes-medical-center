@@ -161,6 +161,15 @@ models:
         +query_tags: '{"layer":"gold","dbt_layer":"marts","domain":"Revenue cycle"}'
       mv_encounter_volume_by_class:
         +query_tags: '{"layer":"gold","dbt_layer":"marts","domain":"Population"}'
+    metrics:
+      +schema: metrics
+      +materialized: metric_view
+      metric_rc_transactions:
+        +query_tags: '{"layer":"gold","dbt_layer":"metrics","domain":"Revenue cycle"}'
+      metric_rc_claims:
+        +query_tags: '{"layer":"gold","dbt_layer":"metrics","domain":"Revenue cycle"}'
+      metric_rc_encounter_costs:
+        +query_tags: '{"layer":"gold","dbt_layer":"metrics","domain":"Revenue cycle"}'
 
 seeds:
   st_bytes_medical_center:
