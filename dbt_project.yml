@@ -33,6 +33,7 @@ models:
     staging:
       +schema: staging
       +materialized: streaming_table
+      +auto_liquid_cluster: true
       stg_allergies:
         +query_tags: '{"layer":"silver","dbt_layer":"staging","domain":"Clinical"}'
       stg_supplies:
@@ -72,6 +73,7 @@ models:
     intermediate:
       +schema: intermediate
       +materialized: table
+      +auto_liquid_cluster: true
       int_patient_demographics:
         +query_tags: '{"layer":"silver","dbt_layer":"intermediate","domain":"Patient"}'
       int_observations_vitals:
@@ -93,6 +95,7 @@ models:
     marts:
       +schema: marts
       +materialized: table
+      +auto_liquid_cluster: true
       dim_patients:
         +query_tags: '{"layer":"gold","dbt_layer":"marts","domain":"Patient"}'
       dim_providers:

@@ -1,3 +1,4 @@
+{{ config(materialized='table') }}
 
 with source as (select * from {{ source('postgres_allergies', 'raw_allergies') }})
 select
