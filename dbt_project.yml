@@ -98,6 +98,9 @@ models:
       +auto_liquid_cluster: true
       dim_patients:
         +query_tags: '{"layer":"gold","dbt_layer":"marts","domain":"Patient"}'
+        +post-hook:
+          - "ALTER TABLE {{ this }} ALTER COLUMN first_name SET TAGS ('customer_pii' = 'name')"
+          - "ALTER TABLE {{ this }} ALTER COLUMN last_name SET TAGS ('customer_pii' = 'name')"
       dim_providers:
         +query_tags: '{"layer":"gold","dbt_layer":"marts","domain":"Operations"}'
       dim_organizations:
