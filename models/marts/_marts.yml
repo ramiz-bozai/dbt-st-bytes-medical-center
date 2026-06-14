@@ -12,9 +12,9 @@ models:
       - name: death_date
         description: "Patient date of death, if recorded."
       - name: first_name
-        description: "Patient given name."
+        description: "Patient given name. Governed tag customer_pii=name; masked via ABAC unless principal is in phi_readers."
       - name: last_name
-        description: "Patient family name."
+        description: "Patient family name. Governed tag customer_pii=name; masked via ABAC unless principal is in phi_readers."
       - name: gender
         description: "Patient gender."
       - name: race
