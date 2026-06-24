@@ -23,7 +23,7 @@ clean-targets:
 #   append: true
 
 vars:
-  synthea_volume_path: "/Volumes/ramiz_fevm_catalog/raw_uploads/synthea_csv"
+  synthea_volume_path: "/Volumes/ramiz_fevm_gcp_central1/raw_uploads/synthea_csvs"
 
 models:
   st_bytes_medical_center:
