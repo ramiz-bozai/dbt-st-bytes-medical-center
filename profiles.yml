@@ -6,7 +6,7 @@ st_bytes_medical_center:
   outputs:
     dev:
       type: databricks
-      host: "https://8259558835430576.6.gcp.databricks.com/"
+      host: "8259558835430576.6.gcp.databricks.com/"
       http_path: "/sql/1.0/warehouses/a6130b119b718dc3"
       catalog: "st_bytes_medical_center_dev"
       schema: "dbt_rbozai"
@@ -15,7 +15,7 @@ st_bytes_medical_center:
 
     prod:
       type: databricks
-      host: "https://8259558835430576.6.gcp.databricks.com/"
+      host: "8259558835430576.6.gcp.databricks.com/"
       http_path: "/sql/1.0/warehouses/a6130b119b718dc3"
       catalog: "st_bytes_medical_center_prod"
       schema: "default"
