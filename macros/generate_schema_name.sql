@@ -10,8 +10,8 @@
     {% elif custom_schema_name is none %}
         {{ default_schema }}
 
-    {# specified custom schema names go to the schema name prepended with the default schema name in prod #}
-    {% elif target.name == 'prod' %}
+    {# prod and serverless job target use +schema from dbt_project.yml #}
+    {% elif target.name in ['prod'] %}
         {{ custom_schema_name | trim }}
 
     {# specified custom schemas go to the default target schema for non-prod targets #}
