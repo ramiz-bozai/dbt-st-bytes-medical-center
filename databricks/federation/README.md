@@ -2,8 +2,12 @@
 
 | File | Purpose |
 |------|---------|
-| `01_lakehouse_federation_setup.sql` | Connection, foreign catalog, grants (templates) |
+| `01_lakehouse_federation_setup.sql` | Connection, foreign catalog, grants (commented templates) |
 
-**dbt:** `models/staging/federation_sources.yml` + `stg_fifa_rankings.sql` → `teams_with_rankings` mart.
+**Not used by dbt today.** `stg_allergies` previously read a federated Postgres catalog; it now
+streams `allergies.csv` from the UC volume like every other staging model, so no model references a
+foreign catalog and `models/staging/__sources.yml` defines no sources.
 
-**Seed stand-in:** `seeds/world-cup/raw_fifa_rankings.csv` loaded into schema `federation` via `dbt_project.yml`.
+Keep this as a reference pattern for when genuinely external reference data needs to be joined in
+(payer metadata, provider registries, marketplace datasets). The SQL is a commented-out template —
+fill in your own connection, host, and secret before running any of it.

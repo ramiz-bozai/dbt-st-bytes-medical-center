@@ -2,11 +2,3 @@ version: 2
 
 # Synthea CSVs are ingested directly in staging streaming tables via read_files()
 # from the Unity Catalog volume (see stream_read_synthea_csv macro).
-
-sources:
-  - name: postgres_allergies
-    description: Tabular data on allergies from the postgres database.
-    database: aiven_postgres_st_bytes_catalog
-    schema: public
-    tables:
-      - name: raw_allergies

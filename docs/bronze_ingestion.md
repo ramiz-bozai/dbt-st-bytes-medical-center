@@ -1,38 +1,42 @@
 # Bronze — St. Bytes Medical Center
 
-## In practice: SDP (recommended)
+## How it works today: CSVs in a UC volume
 
-Use **Spark Declarative Pipelines** to load Synthea exports from cloud storage:
+Staging models read the Synthea CSVs **directly from a Unity Catalog volume**. There is no
+intermediate bronze `raw_*` table layer, and no dbt `source()` in this project.
 
-- Pipeline: `databricks/sdp/st_bytes_bronze_pipeline.py`
-- Target: `{catalog}.raw.raw_*` (18 tables)
-- Audit columns: `_ingested_at`, `_source_system`, `_row_hash`
+- Volume path: `vars.synthea_volume_path` in `dbt_project.yml`
+- Mechanism: `read_files()` via the `stream_read_synthea_csv` macro
+- Each `stg_*` model is a **streaming table** reading one CSV by `pathGlobFilter`
+- Audit columns arrive in the files themselves: `_ingested_at`, `_source_system`, `_row_hash`
 
-dbt only **reads** bronze via `source('bronze', 'raw_<table>')` in staging models.
-
-## In the lab: dbt seed (shortcut)
-
-For local runs without a pipeline:
-
-```bash
-dbt seed --full-refresh
+```sql
+-- models/staging/stg_conditions.sql
+select ...
+{{ stream_read_synthea_csv('conditions.csv') }}
 ```
 
-| Seed file | Bronze table (`raw` schema) |
-|-----------|----------------------------|
-| `patients.csv` | `raw_patients` |
-| `encounters.csv` | `raw_encounters` |
-| `claims_transactions.csv` | `raw_claims_transactions` |
-| … | 18 tables total — see `dbt_project.yml` `seeds:` |
-
-**Do not** `dbt seed` after SDP has loaded the same tables in production.
-
-## Switching SDP schema
-
-If SDP writes to `bronze` instead of `raw`:
+So bronze is just "the 18 CSVs uploaded to the volume." To repoint at a different upload
+location, change the one var:
 
 ```bash
-dbt run --vars '{"bronze_schema": "bronze"}'
+dbt run --vars '{"synthea_volume_path": "/Volumes/my_catalog/my_schema/synthea"}'
 ```
 
-Silver and gold models are unchanged.
+Because staging models are streaming tables, a model that previously existed as a plain table
+needs one `dbt run --select <model> --full-refresh` to be recreated.
+
+## Note on `dbt seed`
+
+`seeds/` is **gitignored**, so a fresh clone has no CSVs and `dbt seed` is not part of the normal
+flow. The `seeds:` block in `dbt_project.yml` still maps each CSV to a `raw_*` alias, so it works
+as a local fallback if you have the files — but nothing in `models/` reads those tables.
+
+## Alternative: SDP owns bronze
+
+If you want a pipeline to land bronze tables instead of reading files from dbt, the pattern is
+**Spark Declarative Pipelines** writing `{catalog}.raw.raw_*`.
+
+> No SDP pipeline file currently lives in this repo — `databricks/sdp/` holds notes only. Adopting
+> this route means adding the pipeline **and** reworking staging models to select from those
+> tables (a `source()` layer), since today they read the volume directly.
