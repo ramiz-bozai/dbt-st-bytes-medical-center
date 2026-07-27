@@ -2,7 +2,7 @@ version: 2
 
 models:
   - name: stg_allergies
-    description: "Cleans and standardizes raw allergy records from Postgres with typed columns and an active-status flag."
+    description: "Stages allergy and intolerance records with typed dates and an active-status flag."
     columns:
       - name: allergy_start_date
         description: "Allergy or intolerance onset date."

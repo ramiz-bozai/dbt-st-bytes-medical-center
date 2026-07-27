@@ -4,7 +4,7 @@ Lakehouse demo using **Synthea** synthetic healthcare data for a Massachusetts p
 
 | # | Concept | Primary repo artifacts |
 |---|---------|----------------------|
-| 1 | Spark Declarative Pipelines (SDP) + dbt | `databricks/sdp/st_bytes_bronze_pipeline.py`, `models/staging/__sources.yml` |
+| 1 | Volume ingest in dbt (`read_files`) | `macros/stream_read_synthea_csv.sql`, `models/staging/stg_*.sql` |
 | 2 | Lakehouse Federation | `databricks/federation/` (optional pattern) |
 | 3 | Unity Catalog metrics views | `databricks/metrics/02_encounter_volume_metrics_view.sql` |
 | 4 | Automatic liquid clustering | `dbt_project.yml`, `databricks/optimization/01_*.sql` |
@@ -16,30 +16,29 @@ Lakehouse demo using **Synthea** synthetic healthcare data for a Massachusetts p
 
 ---
 
-## Bronze in practice vs. this repo
+## How bronze lands in this repo
 
-| Mode | When | How bronze lands | dbt reads |
-|------|------|------------------|-----------|
-| **Production / practice** | Databricks workspace | **SDP** (Lakeflow Declarative Pipelines) ingests CSV/JSON from cloud storage or messaging | `source('bronze', 'raw_*')` — same table names |
-| **Local / lab** | Laptop CI, quick iteration | **`dbt seed`** loads `seeds/st_bytes_medical_center/*.csv` into schema `raw` | Identical `sources.bronze` definitions |
-
-Silver and gold **always** run in dbt. Only the bronze loader changes.
+Staging models read the Synthea CSVs **directly from a Unity Catalog volume** via `read_files()`.
+There is no bronze `raw_*` table layer and no dbt `source()` — bronze is simply the 18 CSVs
+uploaded to `vars.synthea_volume_path`.
 
 ```text
   [Synthea export / EHR feed]
            │
-           ├─ PRACTICE ──► SDP pipeline ──► catalog.raw.raw_*
-           │
-           └─ LAB ───────► dbt seed ─────► catalog.raw.raw_*
+           └─► CSVs uploaded to /Volumes/<catalog>/<schema>/synthea_csvs
                                        │
                                        ▼
-                              dbt silver (stg_*, int_*)
+                      dbt silver — stg_* streaming tables (read_files)
+                                       │
+                                       ▼
+                              dbt int_* (tables)
                                        │
                                        ▼
                               dbt gold (dim_*, fct_*, mart_*)
 ```
 
-Point SDP output at the same **`raw_*` table names** listed in `models/staging/__sources.yml` so you can switch from seed to pipeline without changing staging SQL.
+Details and the SDP alternative: [bronze_ingestion.md](bronze_ingestion.md).
+Credentials and how dbt is invoked locally vs. in a job: [../README.md](../README.md).
 
 ---
 
@@ -94,30 +93,35 @@ Examples: `int_encounters_enriched` (visit + provider + payer context), `int_cla
 
 ---
 
-## Local shortcut (no SDP)
+## Running it
 
-When you only have the repo and a SQL warehouse:
+With the CSVs already in the volume, all you need is the repo and a SQL warehouse:
 
 ```bash
-dbt seed --full-refresh   # bronze into raw.*
-dbt run
-dbt test
+source .venv/bin/activate
+set -a && source .env && set +a
+
+dbt build
 ```
 
-Use the same `dbt run` / test commands after SDP in production — only the bronze step differs.
+Setup, credentials, and how a Databricks job picks up the committed `profiles.yml`:
+[../README.md](../README.md).
 
 ---
 
 ## 1. SDP + dbt (batch & streaming)
 
-### Practice: SDP owns bronze
+### Today: dbt owns the file read
 
-- Pipeline: `databricks/sdp/st_bytes_bronze_pipeline.py`  
-- Upload `seeds/st_bytes_medical_center/*.csv` to cloud storage (or mount the repo path in a workspace).  
-- Configure `CATALOG`, `BRONZE_SCHEMA`, and `BATCH_PATH` at the top of the notebook.  
-- Run as a **Lakeflow Pipeline**; target schema should match `vars.bronze_schema` (default `raw`).
+Staging models stream the CSVs out of the UC volume with `read_files()`, so dbt itself is the
+ingest step — no separate bronze pipeline runs in this repo. Audit columns (`_ingested_at`,
+`_source_system`, `_row_hash`) come from the files.
 
-Each `@dlt.table` writes a `raw_*` name that matches `__sources.yml`. Audit columns mirror the seeded files: `_ingested_at`, `_source_system`, `_row_hash` (hash can be added in SDP with `sha2` of row contents).
+### Alternative: SDP owns bronze
+
+Land `{catalog}.raw.raw_*` from a **Lakeflow Declarative Pipeline**, then point staging at those
+tables via `source()` instead of `read_files()`. `databricks/sdp/` currently holds notes only — no
+pipeline file is committed, so this is a pattern to build, not a path to run today.
 
 ### Optional streaming extension
 
@@ -126,33 +130,33 @@ High-volume tables are good streaming candidates:
 - **`raw_claims_transactions`** — continuous charge/payment feeds  
 - **`raw_observations`** — device/streaming vitals  
 
-Pattern: Auto Loader bronze stream → `unionByName` with batch table (same approach as the legacy NBA box-score stream in `nba_bronze_pipeline.py`).
+Pattern: Auto Loader bronze stream → `unionByName` with the batch table.
 
 ### dbt contract
 
-```yaml
-# models/staging/__sources.yml
-sources:
-  - name: bronze
-    schema: "{{ var('bronze_schema') }}"   # raw
-    tables:
-      - name: raw_encounters
-      # ...
-```
+Today staging reads the volume directly, so the only contract is the **volume path plus the CSV
+filenames**:
 
-Override schema when SDP writes to `bronze` instead of `raw`:
+```yaml
+# dbt_project.yml
+vars:
+  synthea_volume_path: "/Volumes/<catalog>/raw_uploads/synthea_csvs"
+```
 
 ```bash
-dbt run --vars '{"bronze_schema": "bronze"}'
+dbt run --vars '{"synthea_volume_path": "/Volumes/other/path"}'
 ```
 
-**Do not** run `dbt seed` on top of SDP-managed tables in production (double load). Pick one bronze path per environment.
+Adopting an SDP-owned `raw_*` table layer would mean reworking staging models to select from those
+tables instead of `read_files()`. See [bronze_ingestion.md](bronze_ingestion.md).
 
 ---
 
 ## 2. Lakehouse Federation (optional)
 
-Not required for the core Synthea demo. Use when reference data lives **outside** your primary catalog:
+**Nothing in this project uses federation today** — `stg_allergies` was the last model reading a
+foreign catalog and it now streams from the volume like the rest. Keep this in mind as a pattern
+for when reference data genuinely lives **outside** your primary catalog:
 
 | Example use | Federated source | Consumed in dbt |
 |-------------|------------------|-----------------|
@@ -178,21 +182,19 @@ Metrics views sit **above** gold and stay stable while facts evolve.
 
 ## 4. Automatic liquid clustering
 
-Configured in `dbt_project.yml` for large facts:
+`dbt_project.yml` sets `+auto_liquid_cluster: true` on the staging, intermediate, and marts layers,
+so models are created with `CLUSTER BY AUTO` — Databricks picks and evolves the keys.
+
+To pin explicit keys on a large fact instead, useful candidates are:
 
 | Model | Cluster keys |
 |-------|----------------|
 | `fct_encounters` | `encounter_start_date`, `patient_id` |
 | `fct_claim_transactions` | `service_date`, `patient_id` |
-| `fct_observations` | `observation_date`, `patient_id` |
+| `fct_observations` | `observation_at`, `patient_id` |
 
-Post-run, reinforce or inspect:
-
-```bash
-# databricks/optimization/01_automatic_liquid_clustering.sql
-```
-
-`dbt run` applies `CLUSTER BY` hints; optimization SQL validates clustering in the workspace.
+Inspect or override after a run with `databricks/optimization/01_automatic_liquid_clustering.sql`
+(`DESCRIBE DETAIL` to see what is in place, `ALTER TABLE ... CLUSTER BY` to pin keys).
 
 ---
 
@@ -245,39 +247,44 @@ Step-by-step: `databricks/demo/DEMO_WORKFLOW.md`
 
 ## Environment variables
 
+`profiles.yml` is committed at the repo root and hardcodes the non-secret connection details
+(host, `http_path`, catalog, schema per target). The **only** variable dbt itself needs is the
+token:
+
 | Variable | Purpose |
 |----------|---------|
-| `DATABRICKS_HOST` | Workspace URL |
-| `DATABRICKS_HTTP_PATH` | SQL warehouse HTTP path |
-| `DATABRICKS_CATALOG` | Unity Catalog name |
-| `DATABRICKS_SCHEMA` | dbt target schema (silver/gold) |
-| `DATABRICKS_TOKEN` | PAT |
+| `DBT_ACCESS_TOKEN` | The one var `profiles.yml` reads. Locally from `.env`; on a Databricks dbt task, **injected automatically** for the *Run As* principal. |
+| `DATABRICKS_HOST`, `DATABRICKS_HTTP_PATH`, `DATABRICKS_TOKEN` | Used by the Databricks CLI and other tooling, not by `profiles.yml`. See `.env.template`. |
 
-Profile: `st_bytes_medical_center` in `profiles.yml.example`.
+Full explanation of the local vs. job split: [../README.md](../README.md).
 
 ---
 
 ## File index
 
 ```text
-seeds/st_bytes_medical_center/*.csv          # lab bronze only
-models/staging/__sources.yml                 # bronze contract
-models/staging/stg_*.sql                     # silver staging
+profiles.yml                                 # committed, no secrets — see README
+.env / .env.template                         # local secrets (.env is gitignored)
+dbt_project.yml                              # vars.synthea_volume_path = bronze location
+macros/stream_read_synthea_csv.sql           # the read_files() bronze read
+models/staging/stg_*.sql                     # silver staging (streaming tables)
 models/intermediate/int_*.sql                # silver intermediate
 models/marts/{dim,fct,mart}_*.sql            # gold
+models/**/_*.yml                             # model + column docs -> persisted as UC comments
 docs/{platform_guide,data_profile_st_bytes,bronze_ingestion}.md
-databricks/sdp/st_bytes_bronze_pipeline.py   # practice bronze
-databricks/{metrics,optimization,federation,demo}/
+databricks/{metrics,optimization,federation,sdp,demo}/
 macros/{cast_helpers,query_comment_json,generate_schema_name}.sql
+seeds/st_bytes_medical_center/*.csv          # gitignored; unused fallback
 ```
 
 ---
 
 ## Checklist before a customer demo
 
-- [ ] Bronze loaded via **SDP** (or `dbt seed` for dry run)  
-- [ ] `raw_*` row counts match expectations (~111 patients, ~5.7K encounters)  
-- [ ] `dbt run` + `dbt test` green  
+- [ ] All 18 Synthea CSVs present in the volume at `vars.synthea_volume_path`  
+- [ ] `source .env` done — otherwise dbt fails on the missing `DBT_ACCESS_TOKEN`  
+- [ ] Row counts match expectations (~111 patients, ~5.7K encounters)  
+- [ ] `dbt build` green  
 - [ ] Query History shows `layer=gold` tags on mart builds  
 - [ ] Metrics view created and queryable  
-- [ ] Talking point: seeds are stand-in; **SDP is the production bronze path**
+- [ ] Talking point: staging streams straight from the volume — dbt is the ingest step

@@ -1,56 +1,46 @@
 {
   "name": "st_bytes_medical_center_demo",
-  "description": "SDP bronze → dbt silver/gold → metrics view / clustering",
+  "description": "dbt (volume read -> silver/gold) -> clustering / metrics view",
   "tasks": [
     {
-      "task_key": "sdp_bronze_batch",
-      "pipeline_task": {
-        "pipeline_id": "<SDP_PIPELINE_ID>",
-        "full_refresh": false
-      },
-      "description": "Spark Declarative Pipelines: Synthea CSVs → raw.* (18 tables)"
-    },
-    {
-      "task_key": "dbt_silver_gold",
-      "depends_on": [{ "task_key": "sdp_bronze_batch" }],
+      "task_key": "dbt_build",
       "dbt_task": {
-        "project_directory": "/Workspace/Users/<you>/dbt-fifa-analytics",
-        "profiles_directory": "/Workspace/Users/<you>/.dbt",
+        "project_directory": "/Workspace/Users/<you>/dbt-st-bytes-medical-center",
+        "profiles_directory": "",
         "commands": [
           "dbt deps",
-          "dbt run",
-          "dbt test"
+          "dbt build --target prod"
         ]
       },
-      "description": "dbt staging + intermediate + marts (omit dbt seed when SDP loaded bronze)"
+      "description": "Staging streams Synthea CSVs from the UC volume via read_files(), then intermediate + marts. Uses the repo's committed profiles.yml: set SQL warehouse to None (Manual) and leave catalog/schema unset. See 'Configuring the Databricks dbt task' in README.md."
     },
     {
       "task_key": "uc_post_dbt_sql",
-      "depends_on": [{ "task_key": "dbt_silver_gold" }],
+      "depends_on": [{ "task_key": "dbt_build" }],
       "sql_task": {
         "warehouse_id": "<SQL_WAREHOUSE_ID>",
         "file": {
-          "path": "/Workspace/Users/<you>/dbt-fifa-analytics/databricks/optimization/01_automatic_liquid_clustering.sql"
+          "path": "/Workspace/Users/<you>/dbt-st-bytes-medical-center/databricks/optimization/01_automatic_liquid_clustering.sql"
         }
       }
     },
     {
       "task_key": "metrics_view",
-      "depends_on": [{ "task_key": "dbt_silver_gold" }],
+      "depends_on": [{ "task_key": "dbt_build" }],
       "sql_task": {
         "warehouse_id": "<SQL_WAREHOUSE_ID>",
         "file": {
-          "path": "/Workspace/Users/<you>/dbt-fifa-analytics/databricks/metrics/02_encounter_volume_metrics_view.sql"
+          "path": "/Workspace/Users/<you>/dbt-st-bytes-medical-center/databricks/metrics/02_encounter_volume_metrics_view.sql"
         }
       }
     },
     {
       "task_key": "refresh_mv",
-      "depends_on": [{ "task_key": "dbt_silver_gold" }],
+      "depends_on": [{ "task_key": "dbt_build" }],
       "sql_task": {
         "warehouse_id": "<SQL_WAREHOUSE_ID>",
         "file": {
-          "path": "/Workspace/Users/<you>/dbt-fifa-analytics/databricks/optimization/02_refresh_materialized_view.sql"
+          "path": "/Workspace/Users/<you>/dbt-st-bytes-medical-center/databricks/optimization/02_refresh_materialized_view.sql"
         }
       }
     }
