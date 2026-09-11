@@ -38,5 +38,4 @@ venv/
 .env
 *.pem
 
-# Seeds - because it thinks they are secret
-seeds/
+# The bundled Synthea CSVs under seeds/ are synthetic customer-safe demo data.

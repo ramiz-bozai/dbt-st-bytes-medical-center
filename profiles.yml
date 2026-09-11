@@ -1,23 +1,23 @@
-# No secrets in this file — all values come from environment variables.
-# Local: source .env  |  Databricks jobs: DBT_ACCESS_TOKEN is injected automatically.
+# No environment-specific values or secrets are committed here.
+# Copy .env.template to .env, fill it in, then export it before running dbt.
 
 st_bytes_medical_center:
   target: dev
   outputs:
     dev:
       type: databricks
-      host: "8259558835430576.6.gcp.databricks.com/"
-      http_path: "/sql/1.0/warehouses/a6130b119b718dc3"
-      catalog: "st_bytes_medical_center_dev"
-      schema: "dbt_rbozai"
+      host: "{{ env_var('DATABRICKS_HOST') }}"
+      http_path: "{{ env_var('DATABRICKS_HTTP_PATH') }}"
+      catalog: "{{ env_var('DATABRICKS_CATALOG_DEV') }}"
+      schema: "{{ env_var('DATABRICKS_SCHEMA_DEV') }}"
       token: "{{ env_var('DBT_ACCESS_TOKEN') }}"
       threads: 16
 
     prod:
       type: databricks
-      host: "8259558835430576.6.gcp.databricks.com/"
-      http_path: "/sql/1.0/warehouses/a6130b119b718dc3"
-      catalog: "st_bytes_medical_center_prod"
-      schema: "default"
+      host: "{{ env_var('DATABRICKS_HOST') }}"
+      http_path: "{{ env_var('DATABRICKS_HTTP_PATH') }}"
+      catalog: "{{ env_var('DATABRICKS_CATALOG_PROD') }}"
+      schema: "{{ env_var('DATABRICKS_SCHEMA_PROD') }}"
       token: "{{ env_var('DBT_ACCESS_TOKEN') }}"
       threads: 16

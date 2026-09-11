@@ -1,2 +1,5 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# The bundled synthetic dataset is large and not useful as a line-by-line diff.
+seeds/**/*.csv text -diff
