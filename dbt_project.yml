@@ -23,7 +23,7 @@ clean-targets:
 #   append: true
 
 vars:
-  synthea_volume_path: "/Volumes/ramiz_fevm_gcp_central1/raw_uploads/synthea_csvs"
+  synthea_volume_path: "{{ env_var('SYNTHEA_VOLUME_PATH') }}"
 
 models:
   st_bytes_medical_center:
@@ -179,6 +179,7 @@ models:
 
 seeds:
   st_bytes_medical_center:
+    +enabled: false
     +persist_docs:
       relation: true
       columns: true

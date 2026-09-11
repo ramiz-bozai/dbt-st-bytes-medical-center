@@ -12,7 +12,7 @@
           "dbt build --target prod"
         ]
       },
-      "description": "Staging streams Synthea CSVs from the UC volume via read_files(), then intermediate + marts. Uses the repo's committed profiles.yml: set SQL warehouse to None (Manual) and leave catalog/schema unset. See 'Configuring the Databricks dbt task' in README.md."
+      "description": "Staging streams the bundled Synthea CSVs from the customer UC volume via read_files(), then builds intermediate models and marts. The committed profiles.yml reads customer-specific connection values from environment variables. Set SQL warehouse to None (Manual), leave catalog/schema unset, and see 'Configuring the Databricks dbt task' in README.md."
     },
     {
       "task_key": "uc_post_dbt_sql",

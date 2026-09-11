@@ -1,7 +1,8 @@
 # St. Bytes Medical Center — raw data profile
 
 **Source:** Synthea synthetic FHIR export (`_source_system = synthea`)  
-**Bronze location:** `seeds/st_bytes_medical_center/*.csv` → `raw` schema via `dbt seed`  
+**Bronze location:** bundled under `seeds/st_bytes_medical_center/*.csv`, then uploaded to a
+Unity Catalog volume for staging `read_files()` ingestion
 **Profiled:** row counts, keys, null rates (sample), and domain groupings
 
 ## Volume summary

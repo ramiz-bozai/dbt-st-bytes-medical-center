@@ -1,15 +1,14 @@
 # St. Bytes Medical Center — Databricks platform guide
 
-Lakehouse demo using **Synthea** synthetic healthcare data for a Massachusetts provider network. This guide maps **six Databricks capabilities** to repo artifacts and a repeatable demo flow.
+Lakehouse demo using **Synthea** synthetic healthcare data for a Massachusetts provider network. This guide maps **five Databricks capabilities** to repo artifacts and a repeatable demo flow.
 
 | # | Concept | Primary repo artifacts |
 |---|---------|----------------------|
 | 1 | Volume ingest in dbt (`read_files`) | `macros/stream_read_synthea_csv.sql`, `models/staging/stg_*.sql` |
-| 2 | Lakehouse Federation | `databricks/federation/` (optional pattern) |
-| 3 | Unity Catalog metrics views | `databricks/metrics/02_encounter_volume_metrics_view.sql` |
-| 4 | Automatic liquid clustering | `dbt_project.yml`, `databricks/optimization/01_*.sql` |
-| 5 | Materialized views | `databricks/optimization/02_refresh_materialized_view.sql` (pattern) |
-| 6 | Query tags & comments | `dbt_project.yml`, `macros/query_comment_json.sql` |
+| 2 | Unity Catalog metrics views | `databricks/metrics/02_encounter_volume_metrics_view.sql` |
+| 3 | Automatic liquid clustering | `dbt_project.yml`, `databricks/optimization/01_*.sql` |
+| 4 | Materialized views | `databricks/optimization/02_refresh_materialized_view.sql` (pattern) |
+| 5 | Query tags & comments | `dbt_project.yml`, `macros/query_comment_json.sql` |
 
 **Data profile:** [data_profile_st_bytes.md](data_profile_st_bytes.md)  
 **Bronze detail:** [bronze_ingestion.md](bronze_ingestion.md)
@@ -152,23 +151,7 @@ tables instead of `read_files()`. See [bronze_ingestion.md](bronze_ingestion.md)
 
 ---
 
-## 2. Lakehouse Federation (optional)
-
-**Nothing in this project uses federation today** — `stg_allergies` was the last model reading a
-foreign catalog and it now streams from the volume like the rest. Keep this in mind as a pattern
-for when reference data genuinely lives **outside** your primary catalog:
-
-| Example use | Federated source | Consumed in dbt |
-|-------------|------------------|-----------------|
-| CMS payer metadata | External Delta table | `stg_payers` enrichment |
-| NPI / provider registry | JDBC federation | `dim_providers` |
-| Zip → social determinants | Shared marketplace dataset | `mart_population_health` |
-
-Lab setup notes: `databricks/federation/01_lakehouse_federation_setup.sql` and `databricks/federation/README.md`.
-
----
-
-## 3. Unity Catalog metrics views
+## 2. Unity Catalog metrics views
 
 Semantic layer for BI tools (Power BI, Tableau, AI/BI) without exposing the full mart layer.
 
@@ -180,7 +163,7 @@ Metrics views sit **above** gold and stay stable while facts evolve.
 
 ---
 
-## 4. Automatic liquid clustering
+## 3. Automatic liquid clustering
 
 `dbt_project.yml` sets `+auto_liquid_cluster: true` on the staging, intermediate, and marts layers,
 so models are created with `CLUSTER BY AUTO` — Databricks picks and evolves the keys.
@@ -198,7 +181,7 @@ Inspect or override after a run with `databricks/optimization/01_automatic_liqui
 
 ---
 
-## 5. Materialized views
+## 4. Materialized views
 
 Gold marts are **tables** today. For dashboard latency, promote a heavy mart to a UC **materialized view**, e.g.:
 
@@ -213,7 +196,7 @@ Workflow:
 
 ---
 
-## 6. Query tags & comments
+## 5. Query tags & comments
 
 **Warehouse tags** (filter in Query History) are JSON strings on folder config:
 
@@ -247,14 +230,17 @@ Step-by-step: `databricks/demo/DEMO_WORKFLOW.md`
 
 ## Environment variables
 
-`profiles.yml` is committed at the repo root and hardcodes the non-secret connection details
-(host, `http_path`, catalog, schema per target). The **only** variable dbt itself needs is the
-token:
+`profiles.yml` is committed at the repo root but reads all customer-specific connection details
+from environment variables:
 
 | Variable | Purpose |
 |----------|---------|
-| `DBT_ACCESS_TOKEN` | The one var `profiles.yml` reads. Locally from `.env`; on a Databricks dbt task, **injected automatically** for the *Run As* principal. |
-| `DATABRICKS_HOST`, `DATABRICKS_HTTP_PATH`, `DATABRICKS_TOKEN` | Used by the Databricks CLI and other tooling, not by `profiles.yml`. See `.env.template`. |
+| `DATABRICKS_HOST`, `DATABRICKS_HTTP_PATH` | Workspace hostname and SQL warehouse HTTP path used by dbt. |
+| `DBT_ACCESS_TOKEN` | Locally from `.env`; injected for a Databricks dbt task's *Run As* principal. |
+| `DATABRICKS_CATALOG_DEV`, `DATABRICKS_SCHEMA_DEV` | Development output location. |
+| `DATABRICKS_CATALOG_PROD`, `DATABRICKS_SCHEMA_PROD` | Production output location. |
+| `SYNTHEA_VOLUME_PATH` | Unity Catalog volume containing the bundled CSVs. |
+| `DATABRICKS_HOST`, `DATABRICKS_TOKEN` | Databricks CLI authentication used by the upload helper. |
 
 Full explanation of the local vs. job split: [../README.md](../README.md).
 
@@ -272,9 +258,10 @@ models/intermediate/int_*.sql                # silver intermediate
 models/marts/{dim,fct,mart}_*.sql            # gold
 models/**/_*.yml                             # model + column docs -> persisted as UC comments
 docs/{platform_guide,data_profile_st_bytes,bronze_ingestion}.md
-databricks/{metrics,optimization,federation,sdp,demo}/
+databricks/{metrics,optimization,sdp,demo}/
 macros/{cast_helpers,query_comment_json,generate_schema_name}.sql
-seeds/st_bytes_medical_center/*.csv          # gitignored; unused fallback
+scripts/upload_mock_data.sh                  # validates and uploads the bundled CSVs
+seeds/st_bytes_medical_center/*.csv          # bundled Synthea mock data
 ```
 
 ---

@@ -23,14 +23,21 @@ location, change the one var:
 dbt run --vars '{"synthea_volume_path": "/Volumes/my_catalog/my_schema/synthea"}'
 ```
 
+The repository bundles the files under `seeds/st_bytes_medical_center/`. Upload them with:
+
+```bash
+./scripts/upload_mock_data.sh "$SYNTHEA_VOLUME_PATH"
+```
+
 Because staging models are streaming tables, a model that previously existed as a plain table
 needs one `dbt run --select <model> --full-refresh` to be recreated.
 
 ## Note on `dbt seed`
 
-`seeds/` is **gitignored**, so a fresh clone has no CSVs and `dbt seed` is not part of the normal
-flow. The `seeds:` block in `dbt_project.yml` still maps each CSV to a `raw_*` alias, so it works
-as a local fallback if you have the files — but nothing in `models/` reads those tables.
+The CSVs are checked in under `seeds/` so a fresh clone is self-contained. `dbt seed` is not part
+of the normal flow: the upload helper copies the files to the volume and staging reads them with
+`read_files()`. Seed resources are disabled in `dbt_project.yml` so `dbt build` does not load an
+unused second copy; nothing in `models/` reads seeded tables.
 
 ## Alternative: SDP owns bronze
 

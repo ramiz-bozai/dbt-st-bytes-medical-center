@@ -12,11 +12,14 @@
 
 Staging models stream the CSVs straight out of the UC volume with `read_files()`, so the dbt task
 *is* the ingest step — there is no separate bronze pipeline to run. Just make sure all 18 CSVs are
-uploaded to the volume before the demo.
+uploaded to the volume before the demo. A fresh clone contains the files under
+`seeds/st_bytes_medical_center/`; use `scripts/upload_mock_data.sh` to upload them.
 
 The dbt task authenticates using the committed `profiles.yml` at the repo root, with
-`DBT_ACCESS_TOKEN` injected automatically for the job's *Run As* principal. Leave the task's
-**Profiles Directory** blank so it defaults to the repo root. See [../../README.md](../../README.md).
+`DBT_ACCESS_TOKEN` injected automatically for the job's *Run As* principal. Configure the
+`DATABRICKS_*` and `SYNTHEA_VOLUME_PATH` values in the task environment. Leave the task's
+**Profiles Directory** blank so it defaults to the repo root. See
+[../../README.md](../../README.md).
 
 ## 60-minute flow
 
